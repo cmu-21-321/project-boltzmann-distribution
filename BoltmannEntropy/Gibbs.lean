@@ -139,6 +139,9 @@ theorem relEntropy_eq_zero_iff {p q : ι → ℝ} (hp : ∀ i, 0 < p i) (hp1 : �
 /-- Strict Gibbs' inequality: different distributions have positive relative entropy. -/
 theorem relEntropy_pos {p q : ι → ℝ} (hp : ∀ i, 0 < p i) (hp1 : ∑ i, p i = 1)
     (hq : IsProbDist q) (hne : q ≠ p) : 0 < relEntropy q p := by
-  sorry
+    by_contra h
+    have h0 : relEntropy q p = 0 :=
+      le_antisymm (not_lt.mp h) (relEntropy_nonneg hp hp1 hq)
+    exact hne ((relEntropy_eq_zero_iff hp hp1 hq).mp h0)
 
 end MaxEnt
