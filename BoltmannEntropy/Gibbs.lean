@@ -1,7 +1,5 @@
 module
 public import BoltmannEntropy.Defs
-@[expose] public section
-
 /-!
 Gibbs' Inequality for finite probability distributiosn
 
@@ -17,6 +15,8 @@ D(q || p) = ∑qᵢ log (qᵢ / pᵢ) ≥ 0 with equality when p = q.
 * `MaxEnt.relEntropy_eq_zero_iff` : equality case of Gibbs' inequality.
 * `MaxEnt.relEntropy_pos` : strict version.
 -/
+
+@[expose] public section
 
 noncomputable section
 

@@ -1,7 +1,5 @@
 module
 public import BoltmannEntropy.Gibbs
-@[expose] public section
-
 /-!
 # The Gibbs variational principle and maximum entropy
 
@@ -20,14 +18,15 @@ therefore the unique maximum-entropy distribution with its average energy.
 * `MaxEnt.entropy_le_log_card` : no distribution beats the uniform one.
 -/
 
+@[expose] public section
+
 noncomputable section
 
 namespace MaxEnt
 
 variable {ι : Type*} [Fintype ι]
 
-/-- Key idenity: `β F(q) + log Z = D(q || p)`-/
-
+/-- Key identity: `β F(q) + log Z = D(q || p)` -/
 lemma mul_freeEnergy_add_log_partitionFn [Nonempty ι] (E : ι → ℝ) {β : ℝ} (hβ : β ≠ 0)
   {q : ι → ℝ} (hq : IsProbDist q) :
   β * freeEnergy E β q + Real.log (partitionFn E β) = relEntropy q (boltzmann E β) := by

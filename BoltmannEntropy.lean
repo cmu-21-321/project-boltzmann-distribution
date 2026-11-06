@@ -1,5 +1,7 @@
 import BoltmannEntropy.Basic
 import BoltmannEntropy.Defs
+import BoltmannEntropy.Examples
 import BoltmannEntropy.Gibbs
 import BoltmannEntropy.Variational
 import BoltmannEntropy.Limits
+import BoltmannEntropy.Main

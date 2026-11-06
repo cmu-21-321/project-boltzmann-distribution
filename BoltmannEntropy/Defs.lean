@@ -1,5 +1,6 @@
 module
 public import Mathlib
+@[expose] public section
 /-!
 ## Main definitions
 
@@ -105,5 +106,20 @@ theorem log_boltzmann [Nonempty ι] (E : ι → ℝ) (β : ℝ) (i : ι) :
   · rw [Real.log_exp]
   · exact ne_of_gt (Real.exp_pos _)
   · exact ne_of_gt (partitionFn_pos E β)
+
+/-! ### Explicit-sum forms
+Entropy and free energy with the `negMulLog` convention unfolded
+These are needed in the Main.lean file for the final proof. -/
+
+/-- Entropy with the sum written out: `S(q) = -∑ qᵢ log qᵢ`. -/
+theorem entropy_eq_neg_sum (q : ι → ℝ) : entropy q = -∑ i, q i * Real.log (q i) := by
+  simp only [entropy, Real.negMulLog, neg_mul, Finset.sum_neg_distrib]
+
+/-- Free energy with the sums written out: `F(q) = ∑ qᵢ Eᵢ + (1/β) ∑ qᵢ log qᵢ`. -/
+theorem freeEnergy_eq_sum (E : ι → ℝ) (β : ℝ) (q : ι → ℝ) :
+    freeEnergy E β q = ∑ i, q i * E i + (1 / β) * ∑ i, q i * Real.log (q i) := by
+  unfold freeEnergy meanEnergy
+  rw [entropy_eq_neg_sum]
+  ring
 
 end MaxEnt
