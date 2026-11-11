@@ -1,4 +1,5 @@
 module
+public import BoltmannEntropy.Defs
 public import BoltmannEntropy.Variational
 public import BoltmannEntropy.Limits
 /-!
@@ -67,7 +68,7 @@ theorem tendsto_entropy_boltzmann_atTop [Nonempty ι]
     Filter.Tendsto
       (fun β : ℝ => entropy (boltzmann E β))
       Filter.atTop
-      (nhds (Real.log (groundStates E).ncard : ℝ)) := by
+      (nhds (Real.log (groundStates E).card : ℝ)) := by
   sorry
 
 end MaxEnt
