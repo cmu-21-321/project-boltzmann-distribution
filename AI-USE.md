@@ -8,3 +8,7 @@ Also I used AI to write comments on what defs were provided because I wanted nic
 
 ## Main.lean
 When creating Main.lean, I noticed that the proof was really difficult to make so I asked Claude for advice on how to simplify this. It recommended making an extra two lemmas to handle the exxtra work (entropy_eq_neg_sum, freeEnergy_boltzmann). So I went ahead and added those two in and then the proof became a little simpler to do!
+
+
+## Physlib.lean
+We used AI to determine how to map our existing state into Physlib by just basing the def of MaxEnt over PhysLib properties rather than MathLib properties.

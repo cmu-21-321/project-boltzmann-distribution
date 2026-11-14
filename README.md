@@ -1,67 +1,51 @@
 # BoltmannEntropy
 
-A template for Lean 4 projects that depend on [Mathlib](https://github.com/leanprover-community/mathlib4).
+A Lean 4 formalization of the maximum-entropy / Gibbs variational characterization of the
+Boltzmann distribution on a finite set of states, connected to the canonical ensemble in
+[Physlib](https://github.com/leanprover-community/physlib).
 
-## Prerequisites
+## Contents
 
-Install Lean via [elan](https://github.com/leanprover/elan) (see the
-[Lean installation guide](https://lean-lang.org/install/)). The correct Lean version is
-picked up automatically from `lean-toolchain`.
+| File | What it contains |
+|---|---|
+| `BoltmannEntropy/Defs.lean` | Entropy, mean energy, partition function, Boltzmann distribution, free energy, relative entropy |
+| `BoltmannEntropy/Gibbs.lean` | Gibbs' inequality: relative entropy is nonnegative, and zero only for equal distributions |
+| `BoltmannEntropy/Variational.lean` | The Boltzmann distribution uniquely minimizes free energy and maximizes entropy at fixed mean energy |
+| `BoltmannEntropy/Main.lean` | The headline result, stated with explicit sums |
+| `BoltmannEntropy/Limits.lean` | High- and low-temperature limits of the Boltzmann distribution |
+| `BoltmannEntropy/FurtherWork.lean` | Independent systems and entropy limits (in progress) |
+| `BoltmannEntropy/Physlib.lean` | Bridge to Physlib's `CanonicalEnsemble`, and the main results restated in its language |
+| `BoltmannEntropy/Examples.lean` | Sanity checks |
 
-## 1. Rename the project
+The core development (`MaxEnt` namespace) uses a bare energy function `E : ι → ℝ` and a real
+inverse temperature `β`. `Physlib.lean` shows that for a finite canonical ensemble
+(`[𝓒.IsFinite]`) these agree with Physlib's `partitionFunction`, `probability`, `meanEnergy`,
+`shannonEntropy` and `helmholtzFreeEnergy` at `β = 1 / (k_B T)`.
 
-After creating your repository from this template, rename it from `ProjectTemplate` to your
-own project name:
+## Building
 
-```bash
-./customize.sh MyProject
-```
-
-This updates `lakefile.toml`, `lake-manifest.json`, the Lean imports and this README's title, and
-renames `ProjectTemplate.lean` and `ProjectTemplate/` to `MyProject.lean` and `MyProject/`.
-The name must be a valid Lean module name (letters, digits and underscores, starting with a
-letter; UpperCamelCase is conventional). Commit the result, then delete `customize.sh`.
-
-## 2. Get the Mathlib cache
-
-Compiling Mathlib from source takes hours, so download the prebuilt files instead:
-
-```bash
-lake exe cache get
-```
-
-Re-run this whenever you change the Mathlib version (or if your editor starts rebuilding
-Mathlib files).
-
-## 3. Build and work on the project
+Install Lean via [elan](https://github.com/leanprover/elan). The Lean version comes from
+`lean-toolchain`. Then run:
 
 ```bash
+lake exe cache get   # prebuilt Mathlib
 lake build
 ```
 
-- Put your Lean files under `MyProject/` and import each one from `MyProject.lean`, so that
-  `lake build` (and CI) checks them.
-- Open the repository folder (not a single file) in VS Code with the Lean 4 extension.
+Physlib modules are compiled locally on the first build. Only the ones this project imports are
+built.
 
-## Updating Mathlib
+## Updating dependencies
 
-Change the `rev` under `[[require]]` in `lakefile.toml` to the new Mathlib tag, and set
-`lean-toolchain` to match. Then run:
+Physlib pins its own Mathlib version, so this project follows Physlib's release tags rather than
+Mathlib's. To update, set `rev` under `[[require]]` in `lakefile.toml` to a new Physlib tag, set
+`lean-toolchain` to Physlib's toolchain for that tag, then run:
 
 ```bash
-lake update mathlib
+lake update
 lake exe cache get
 lake build
 ```
 
-Alternatively, run the **Update Dependencies** workflow from the GitHub *Actions* tab: it
-opens a pull request if the update builds, or an issue if it doesn't. (Uncomment the
-`schedule` block in `.github/workflows/update.yml` to run it automatically.)
-
-## GitHub setup
-
-- **CI**: every push and pull request is built by `.github/workflows/lean_action_ci.yml`.
-- To let the update workflow open pull requests, go to **Settings → Actions → General** and
-  tick **Allow GitHub Actions to create and approve pull requests**.
-- To publish docs to GitHub Pages, set **Settings → Pages → Source** to "GitHub Actions" and
-  uncomment the `docgen-action` line in `lean_action_ci.yml`.
+The **Update Dependencies** GitHub workflow (`.github/workflows/update.yml`) tracks Mathlib
+releases, not Physlib releases. Prefer updating by hand.

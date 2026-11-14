@@ -1,6 +1,6 @@
 name = "BoltmannEntropy"
 version = "0.1.0"
-keywords = ["math"]
+keywords = ["math", "physics"]
 defaultTargets = ["BoltmannEntropy"]
 
 [leanOptions]
@@ -9,10 +9,11 @@ relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
 
+# Physlib brings in Mathlib (pinned to the matching version) as a dependency.
 [[require]]
-name = "mathlib"
-scope = "leanprover-community"
-rev = "v4.36.0-rc1"
+name = "physlib"
+git = "https://github.com/leanprover-community/physlib.git"
+rev = "v4.35.0"
 
 [[lean_lib]]
 name = "BoltmannEntropy"
