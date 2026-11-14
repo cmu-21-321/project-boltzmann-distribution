@@ -11,4 +11,4 @@ When creating Main.lean, I noticed that the proof was really difficult to make s
 
 
 ## Physlib.lean
-We used AI to determine how to map our existing state into Physlib by just basing the def of MaxEnt over PhysLib properties rather than MathLib properties.
+We used AI to determine how to map our existing state into Physlib by just basing the def of MaxEnt over PhysLib properties rather than MathLib properties. We also used AI in order to figure out how to make the lake file work with Claude, which is why one of our commits says Co-authored by Claude (we got really lost doing it).
