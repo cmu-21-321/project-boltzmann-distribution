@@ -4,13 +4,16 @@ public import BoltmannEntropy.Defs
 # Temperature limits
 
 * High temperature (`β → 0`): the Boltzmann distribution becomes uniform.
-* Low temperature (`β → ∞`): to be added later, together with ground states.
+* Low temperature (`β → ∞`): the Boltzmann distribution concentrates uniformly
+  on the ground states.
 
 ## Main results
 
 * `MaxEnt.boltzmann_zero` : at `β = 0` every state has probability `1/n`.
 * `MaxEnt.continuous_boltzmann` : each Boltzmann probability is continuous in `β`.
 * `MaxEnt.tendsto_boltzmann_zero` : the high-temperature limit.
+* `MaxEnt.tendsto_boltzmann_atTop` : the low-temperature limit; ground states
+  get probability `1/|G|`, all other states get `0`.
 -/
 
 @[expose] public section
@@ -108,6 +111,52 @@ lemma tendsto_exp_neg_mul_atTop (a : ℝ) (ha : 0 ≤ a) :
       Real.tendsto_exp_atBot.comp harg
     simpa [h] using hlim
 
+/-- Shifting an energy by the ground-state energy gives a nonnegative value:
+`0 ≤ Eᵢ - E₀`. -/
+lemma shiftedEnergy_nonneg [Nonempty ι]
+    (E : ι → ℝ) (i : ι) :
+    0 ≤ E i - groundEnergy E := by
+  exact sub_nonneg.mpr (groundEnergy_le E i)
+
+/-- As `β → ∞`, the shifted Boltzmann weight `exp (-β (Eᵢ - E₀))` tends to `1`
+if `i` is a ground state and to `0` otherwise. -/
+lemma tendsto_exp_shifted_energy [Nonempty ι]
+    (E : ι → ℝ) (i : ι)
+    [Decidable (i ∈ groundStates E)] :
+    Tendsto
+      (fun β : ℝ =>
+        Real.exp (-β * (E i - groundEnergy E)))
+      Filter.atTop
+      (nhds (if i ∈ groundStates E then (1 : ℝ) else 0)) := by
+  have h := tendsto_exp_neg_mul_atTop
+    (E i - groundEnergy E)
+    (shiftedEnergy_nonneg E i)
+  simpa [groundStates, sub_eq_zero] using h
+
+/-- As `β → ∞`, the shifted partition function `∑ⱼ exp (-β (Eⱼ - E₀))` tends to
+the number of ground states `|G|`. -/
+lemma tendsto_shifted_partitionFn [Nonempty ι]
+    (E : ι → ℝ) :
+    Tendsto
+      (fun β : ℝ =>
+        ∑ i, Real.exp (-β * (E i - groundEnergy E)))
+      Filter.atTop
+      (nhds ((groundStates E).card : ℝ)) := by
+  classical
+  have hterm (i : ι) :=
+    tendsto_exp_shifted_energy E i
+  have hsum :
+      Tendsto
+        (fun β : ℝ =>
+          ∑ i, Real.exp (-β * (E i - groundEnergy E)))
+        Filter.atTop
+        (nhds (∑ i, if i ∈ groundStates E then (1 : ℝ) else 0)) := by
+    apply tendsto_finsetSum
+    intro i hi
+    exact hterm i
+  convert hsum using 1
+  simp [groundStates]
+
 /-- **Low-temperature limit:** as β tends to infinity, the Boltzmann
 distribution converges to the uniform distribution over ground states.
 
@@ -122,6 +171,34 @@ theorem tendsto_boltzmann_atTop [Nonempty ι]
       (nhds (if i ∈ groundStates E
         then 1 / ((groundStates E).card : ℝ)
         else 0)) := by
-  sorry
+  have hnum := tendsto_exp_shifted_energy E i
+  have hden := tendsto_shifted_partitionFn E
+  have hcard : (groundStates E).card ≠ 0 :=
+    Nat.ne_of_gt (Finset.card_pos.mpr (groundStates_nonempty E))
+  have hquot := hnum.div hden (by exact_mod_cast hcard)
+  have hrewrite (β : ℝ) :
+      boltzmann E β i =
+        (Real.exp (-β * (E i - groundEnergy E))) /
+          (∑ j, Real.exp (-β * (E j - groundEnergy E))) := by
+    rw [← boltzmann_sub_const E β (groundEnergy E) i]
+    unfold boltzmann partitionFn
+    rfl
+  have hfinal :
+      (if i ∈ groundStates E then (1 : ℝ) else 0) /
+          (groundStates E).card =
+        if i ∈ groundStates E
+          then 1 / ((groundStates E).card : ℝ)
+          else 0 := by
+    split_ifs <;> simp
+  have hfunc :
+      (fun β : ℝ =>
+        Real.exp (-β * (E i - groundEnergy E)) /
+          (∑ j, Real.exp (-β * (E j - groundEnergy E)))) =
+      (fun β => boltzmann E β i) := by
+    funext β
+    exact (hrewrite β).symm
+  rw [hfinal] at hquot
+  rw [← hfunc]
+  exact hquot
 
 end MaxEnt
