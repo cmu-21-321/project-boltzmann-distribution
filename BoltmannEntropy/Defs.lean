@@ -23,8 +23,12 @@ namespace MaxEnt
 variable {ι : Type*} [Fintype ι]
 
 /-- `q` is a probability distribution on the finite set of states `ι`. -/
-def IsProbDist (q : ι → ℝ) : Prop :=
-  (∀ i, 0 ≤ q i) ∧ ∑ i, q i = 1
+@[mk_iff]
+structure IsProbDist (q : ι → ℝ) : Prop where
+  /-- Every probability is nonnegative. -/
+  nonneg : ∀ i, 0 ≤ q i
+  /-- The probabilities sum to one. -/
+  sum_eq_one : ∑ i, q i = 1
 
 /-- Shannon entropy `S(q) = -∑ qᵢ log qᵢ`. -/
 def entropy (q : ι → ℝ) : ℝ :=
@@ -55,23 +59,15 @@ Z > 0
 Boltzmann probabilities are positive and sum to 1
 log of a Boltzmann probability -/
 
-theorem IsProbDist.nonneg {q : ι → ℝ} (hq : IsProbDist q) (i : ι) : 0 ≤ q i := by
-  rcases hq with ⟨a, b⟩
-  apply a
-
-theorem IsProbDist.sum_eq_one {q : ι → ℝ} (hq : IsProbDist q) : ∑ i, q i = 1 := by
-  rcases hq with ⟨a, b⟩
-  apply b
-
 /-- A probability distribution can only live on a nonempty set of states. -/
 theorem IsProbDist.nonempty {q : ι → ℝ} (hq : IsProbDist q) : Nonempty ι := by
   by_contra h
   have hempty : IsEmpty ι := not_nonempty_iff.mp h
   have hsum : ∑ i, q i = 0 := by
     simp
-  rcases hq with ⟨a, b⟩
-  rw [hsum] at b
-  exact zero_ne_one b
+  have hone := hq.sum_eq_one
+  rw [hsum] at hone
+  exact zero_ne_one hone
 
 theorem partitionFn_pos [Nonempty ι] (E : ι → ℝ) (β : ℝ) : 0 < partitionFn E β := by
   unfold partitionFn
@@ -92,12 +88,9 @@ theorem sum_boltzmann [Nonempty ι] (E : ι → ℝ) (β : ℝ) : ∑ i, boltzma
 
 
 theorem isProbDist_boltzmann [Nonempty ι] (E : ι → ℝ) (β : ℝ) :
-    IsProbDist (boltzmann E β) := by
-  unfold IsProbDist
-  constructor
-  · intro i
-    exact le_of_lt (boltzmann_pos E β i)
-  · exact sum_boltzmann E β
+    IsProbDist (boltzmann E β) where
+  nonneg i := le_of_lt (boltzmann_pos E β i)
+  sum_eq_one := sum_boltzmann E β
 
 theorem log_boltzmann [Nonempty ι] (E : ι → ℝ) (β : ℝ) (i : ι) :
     Real.log (boltzmann E β i) = -β * E i - Real.log (partitionFn E β) := by
