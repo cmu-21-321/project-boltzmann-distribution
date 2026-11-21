@@ -1,6 +1,11 @@
+/-
+Copyright (c) 2026 Yuktha Vemula, Cassandra Yang. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yuktha Vemula, Cassandra Yang
+-/
 module
 
-public import BoltmannEntropy.Variational
+public import BoltzmannEntropy.Variational
 public import Physlib.StatisticalMechanics.CanonicalEnsemble.Finite
 
 /-!
@@ -125,14 +130,14 @@ theorem helmholtzFreeEnergy_eq_iff [𝓒.IsFinite] [Nonempty ι] (T : Temperatur
   exact MaxEnt.freeEnergy_eq_freeEnergy_boltzmann_iff _ (beta_pos T hT) hq
 
 /-- **Maximum entropy.** Among distributions with the same mean energy as the canonical
-ensemble at temperature `T > 0`, none has more entropy. -/
+ensemble at temperature `T`, none has more entropy. -/
 theorem kB_mul_entropy_le_shannonEntropy [𝓒.IsFinite] [Nonempty ι] (T : Temperature)
-    (hT : 0 < T.val) {q : ι → ℝ} (hq : MaxEnt.IsProbDist q)
+    {q : ι → ℝ} (hq : MaxEnt.IsProbDist q)
     (hU : MaxEnt.meanEnergy 𝓒.energy q = 𝓒.meanEnergy T) :
     kB * MaxEnt.entropy q ≤ 𝓒.shannonEntropy T := by
   rw [shannonEntropy_eq_kB_mul_entropy, probability_eq_boltzmann_fun]
   rw [meanEnergy_eq_maxEnt_meanEnergy, probability_eq_boltzmann_fun] at hU
-  exact mul_le_mul_of_nonneg_left (MaxEnt.entropy_le_entropy_boltzmann _ (beta_pos T hT) hq hU)
+  exact mul_le_mul_of_nonneg_left (MaxEnt.entropy_le_entropy_boltzmann _ _ hq hU)
     kB_nonneg
 
 /-- The entropy of a finite canonical ensemble is at most `k_B log |ι|`. -/

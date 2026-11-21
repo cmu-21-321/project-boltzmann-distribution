@@ -1,14 +1,42 @@
-# Week of 10/18 - 10/24:
+# AI-use statement
 
-## Defs.lean/Variational.lean/Limits.lean/Gibbs.lean:
-AI was utilized here in order to give us some ideas of what definitions would be necessary since we haven't gone over probability distribution logic in class. Once that was done, we did the proof by hand in Defs.lean. However, we did need AI assistence in order to determine some of the logic for handling exponents as we haven't discussed this. AI did not fully supply proofs - it just gave us hints towards functions to use cause we couldn't really get answers from the apply? and exact? due to the vast number of steps in between. One example of a hint was in the proof of sum_boltzmann where AI told us to this exactly "-- Hint: `Finset.sum_div`, then `div_self`."
+We used AI, mainly Claude, in different ways in different parts of the project. File by file:
 
-Also I used AI to write comments on what defs were provided because I wanted nicer formatting than I had initially. For each file, it read through what we had and wrote comments to tag what the main findings were (the docstring like tag at the top of the file is what was ai generated + the comments about what each lemma/theorem is was cleaned up with ai from some messy math to cleaner!)
+## `Defs.lean`, `Gibbs.lean`, `Variational.lean`, `Limits.lean`
+
+We hadn't covered probability distributions in class, so we used AI to suggest which definitions we would need. Once we had them, we wrote the proofs in `Defs.lean` by hand. We did need AI's help with the logic for handling exponentials, which we also hadn't covered. AI did not supply full proofs in these files. It gave us hints about which functions and lemmas to use, because `apply?` and `exact?` couldn't find answers when there were many steps in between. For example, the hint for `sum_boltzmann` was exactly
+
+```lean
+-- Hint: `Finset.sum_div`, then `div_self`.
+```
+
+## `Examples.lean`
+
+Making this file was Claude's suggestion, as a check of our definitions before we added the larger proofs and the extensions. We (Cassandra and Yuktha) chose the examples ourselves. They are the ones physics textbooks traditionally use to build intuition for entropy.
+
+## `Main.lean`
+
+The principal result was hard to prove directly, so Yuktha asked Claude how to simplify it. It suggested adding two helper lemmas to handle the extra work, `entropy_eq_neg_sum` and `freeEnergy_boltzmann`. We added them, and the proof became simpler.
 
 
-## Main.lean
-When creating Main.lean, I noticed that the proof was really difficult to make so I asked Claude for advice on how to simplify this. It recommended making an extra two lemmas to handle the exxtra work (entropy_eq_neg_sum, freeEnergy_boltzmann). So I went ahead and added those two in and then the proof became a little simpler to do!
+## `Physlib.lean`
 
+We used AI to work out how to map our development onto Physlib, stating the bridge in terms of Physlib's definitions rather than only Mathlib's. We also used Claude to get our Lake configuration working, which is why one of our commits is marked as co-authored by Claude.
 
-## Physlib.lean
-We used AI to determine how to map our existing state into Physlib by just basing the def of MaxEnt over PhysLib properties rather than MathLib properties. We also used AI in order to figure out how to make the lake file work with Claude, which is why one of our commits says Co-authored by Claude (we got really lost doing it).
+## `Independent.lean`, `Thermodynamics.lean`, `MaxEntConverse.lean`
+
+About two weeks before the deadline, we had finished everything we had originally planned. To decide what to add, we used a combination of Claude and the Physlib Zulip, and settled on three directions.
+
+- **Independent systems (`Independent.lean`).** Combining independent systems was the original goal of our further-work file, so we moved that proof into this file. Additivity over combined systems is one of the main facts used in arguments about entropy, and our goal was to go from "entropy is additive" to "all of the thermodynamics is additive". AI helped us see how to turn the existing further-work proofs into this more general form, specifically in organizing the proofs of `meanEnergy_prod` and `entropy_prod`.
+- **How equilibrium quantities change with β (`Thermodynamics.lean`).** Our original project did not include the calculus of the thermodynamic quantities, and we hadn't covered these concepts in class, so we leaned on Claude heavily here. We structured the file ourselves, deciding how to build up the results we needed and which thermodynamic identities would help, but AI was used very heavily in creating the proofs. We worked through them with it, but needed a lot of hints. We still wanted to include this file, because these identities are central to why entropy is important in physics, and we thought it would be a good contribution to Physlib.
+- **Maximum entropy at a prescribed mean energy (`MaxEntConverse.lean`).** While using Claude to look for weak points in our code, we focused on the fact that the maximum-entropy theorem in `Variational.lean` is conditional: it only compares `q` with a Boltzmann distribution that is already known to have the same mean energy. The new file starts from a target mean energy alone, and shows that exactly one β gives a Boltzmann distribution with that mean energy, which is then the unique maximum-entropy distribution with it. AI identified what this would require: `Variational.lean` had to be generalized to all real β, and `Limits.lean` needed the β → −∞ and mean-energy limits. We brainstormed how to organize and structure the file, iterating with Claude when we got stuck, and then wrote the file and its proofs with hints from AI when we were stumped. Our first version used `apply` instead of `obtain`, which made the proof very messy, and Claude helped us refactor it.
+
+## Comments and headers
+
+AI wrote all of the copyright and license headers. It also rewrote the comments in all of our files. We had written English comments explaining what the code was doing, and AI turned these fragments into full sentences. The module docstring at the top of each file was generated by AI after reading the file, and the docstrings on individual lemmas and theorems were cleaned up with AI from our rougher math notes.
+
+## Write-up
+
+We used Claude for assistance in the written report. It helped us determine an outline for how the project would be structured at first. Then, from there, we worked on adding to all of the sections individually and creating an initial rough draft. Then, we went through and provided Claude our write-up and our code and allowed it to ensure that our work aligned well between the two. Primarily, the issues at this point has to deal with us mistaking variable names/theorem names between the write-up and the code. In addition, it provided us with insights as to how to improve the overall flow of the piece and work from there. Finally, it revised the wording of the whole report and turned our notes into this AI-use statement, and edited the wording of our collaboration statement.
+
+Now, to determine that no inaccurate changes were made been what we wrote and what the AI editted, we read through the whole file and made sure it aligned. In addition, we had Claude itemize all of the changes that were made and noted that primarily that had to deal with clarifying our proofs or helping us account for missing edges cases that we had in the lean proof but did not include the actual proof in the paper.

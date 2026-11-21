@@ -1,6 +1,11 @@
+/-
+Copyright (c) 2026 Yuktha Vemula, Cassandra Yang. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yuktha Vemula, Cassandra Yang
+-/
 module
 
-public import BoltmannEntropy.Defs
+public import BoltzmannEntropy.Defs
 
 /-!
 # Sanity checks
